@@ -1,1 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBAS — Self-Bootstrapping Agent System · Ryan Andersen</title>
+<style>
+  :root{
+    --ink:#e9e4d6; --ink-2:#b5af9f; --ink-3:#847e6f;
+    --accent:#8fbf9a; --accent-soft:#16241c; --accent-line:#33473a;
+    --gold:#d9a441;
+    --surface:#0f1512; --card:#161e19; --rule:#26312a;
+    --mono:'SF Mono',Consolas,'Liberation Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--surface);color:var(--ink);font:16px/1.65 Charter,Georgia,'Times New Roman',serif;-webkit-font-smoothing:antialiased}
+  .sans{font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:780px;margin:0 auto;padding:0 28px 72px}
+
+  header{border-bottom:3px solid var(--accent);padding:56px 0 32px;margin-bottom:40px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  h1{font-size:40px;line-height:1.15;letter-spacing:-.01em;font-weight:700}
+  .subtitle{font-size:19px;color:var(--ink-2);margin-top:14px;max-width:60ch}
+  .byline{font-family:-apple-system,'Segoe UI',sans-serif;font-size:13.5px;color:var(--ink-3);margin-top:20px}
+  .byline a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-line)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 44px}
+  .stat{background:var(--card);border:1px solid var(--rule);border-top:3px solid var(--gold);border-radius:6px;padding:16px 14px 14px}
+  .stat .label{font-family:-apple-system,'Segoe UI',sans-serif;font-size:11.5px;letter-spacing:.02em;color:var(--ink-3);margin-bottom:6px;line-height:1.35}
+  .stat .value{font-family:-apple-system,'Segoe UI',sans-serif;font-size:26px;font-weight:600;line-height:1.1;color:var(--gold)}
+  .stat .unit{font-size:13px;font-weight:500;color:var(--ink-2)}
+
+  h2{font-family:-apple-system,'Segoe UI',sans-serif;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:46px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--accent-line)}
+  p{margin-bottom:16px;max-width:70ch}
+  strong{font-weight:700}
+  .lede{font-size:18.5px;line-height:1.6}
+
+  ul.sys{list-style:none;margin:0 0 16px}
+  ul.sys li{padding:11px 0 11px 26px;border-bottom:1px solid var(--rule);position:relative;max-width:none}
+  ul.sys li::before{content:'';position:absolute;left:4px;top:20px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  ul.sys li b{font-family:-apple-system,'Segoe UI',sans-serif;font-size:15px}
+  ul.sys li span{color:var(--ink-2)}
+
+  .story{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:22px 26px;margin:26px 0}
+  .story .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  .story p{font-size:15.5px}
+  .story p:last-child{margin-bottom:0}
+
+  .principles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .pr{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 18px 16px}
+  .pr h3{font-family:-apple-system,'Segoe UI',sans-serif;font-size:14.5px;font-weight:700;margin-bottom:6px}
+  .pr p{font-size:14px;color:var(--ink-2);margin:0;line-height:1.55}
+
+  figure.shot{margin:26px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px}
+  figure.shot .frame{border:2px dashed var(--accent-line);border-radius:6px;min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;color:var(--ink-3);font-family:-apple-system,'Segoe UI',sans-serif;font-size:13.5px;line-height:1.6}
+  figure.shot img{width:100%;border-radius:6px;display:block}
+  figure.shot figcaption{font-family:-apple-system,'Segoe UI',sans-serif;font-size:13px;color:var(--ink-2);padding:12px 4px 2px;line-height:1.5}
+
+  .shots-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .shots-row figure.shot{margin:10px 0}
+
+  footer{margin-top:56px;padding-top:24px;border-top:3px solid var(--accent);font-family:-apple-system,'Segoe UI',sans-serif;font-size:14px;color:var(--ink-2)}
+  footer a{color:var(--accent)}
+
+  @media(max-width:640px){
+    .stats{grid-template-columns:1fr 1fr}
+    .principles,.shots-row{grid-template-columns:1fr}
+    h1{font-size:32px}
+  }
+  @media print{
+    :root{
+      --ink:#1c211e; --ink-2:#4a524d; --ink-3:#79817c;
+      --accent:#1a4d2e; --accent-soft:#e8f0ea; --accent-line:#bfd4c5;
+      --gold:#8a6314; --surface:#ffffff; --card:#ffffff; --rule:#e4e2dc;
+    }
+    body{background:#fff}
+    .wrap{max-width:none;padding:0 8px}
+    .stat,.pr,figure.shot{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Independent project · 2026</div>
+  <h1>SBAS — Self&#8209;Bootstrapping Agent&nbsp;System</h1>
+  <p class="subtitle">A self-hosted AI orchestration platform where agent teams do the work and a human makes every decision that matters — designed and built end-to-end by one person, with Claude.</p>
+  <div class="byline">Ryan Andersen · <a href="mailto:ryanandersen18@gmail.com">ryanandersen18@gmail.com</a> · <a href="https://www.linkedin.com/in/ryan-andersen18">linkedin.com/in/ryan-andersen18</a> · Updated July 2026</div>
+</header>
+
+<div class="stats sans">
+  <div class="stat"><div class="label">Research documents produced &amp; audited</div><div class="value">170<span class="unit">+</span></div></div>
+  <div class="stat"><div class="label">Verified research syntheses in one week</div><div class="value">7</div></div>
+  <div class="stat"><div class="label">Monitoring heartbeats logged</div><div class="value">1000<span class="unit">s</span></div></div>
+  <div class="stat"><div class="label">Paths that can change system data</div><div class="value">1</div></div>
+</div>
+
+<h2>What it is</h2>
+<p class="lede">SBAS runs on a small Linux server I administer: coordinated teams of Claude-powered agents that research topics in parallel, synthesize findings with citations, and propose actions — every consequential one of which waits for my explicit approval, delivered from a review interface on my phone. The stack is deliberately boring and ownable: open workflow automation (n8n), PostgreSQL, and Claude.</p>
+<p>"Self-bootstrapping" is the design goal: every decision, correction, and execution record the system produces is captured, so each version of the system helps build the next one.</p>
+
+<h2>Why I built it</h2>
+<p>I started with two questions. The first was ambitious: <strong>how much can one person build with Claude and modern tooling?</strong> The second turned out to be the real project: <strong>what does it take to make AI output trustworthy enough to act on?</strong></p>
+<p>Anyone can wire agents together. Getting an honest system is the hard part — knowing where a claim came from, catching the model when it's ungrounded, and knowing whether the pipeline actually did what it says it did. Most of SBAS is machinery for exactly that.</p>
+
+<h2>How it works, in plain language</h2>
+<p>Three rules organize everything. <strong>One way in:</strong> anything that changes the system — recording an approval, submitting a job, writing to memory — goes through a single set of cryptographically signed command endpoints. <strong>One way to look:</strong> everything else is read-only; any interface can see the same ground truth but can't alter it. <strong>One place to decide:</strong> every consequential action funnels to a human approval rail, where I approve, deny (which always means "revise," with my written reasoning attached), or defer. My reasoning on each decision is captured, so over time the system learns what my judgment looks like — and earns automation instead of assuming it.</p>
+<p>The deeper design bet: <strong>anything that can run as fixed, verifiable logic does.</strong> The model is handed only the steps that genuinely need judgment, and each of those is fenced by a checkpoint. A deterministic step can't confabulate, and it can be audited from records.</p>
+
+<h2>What's running today</h2>
+<ul class="sys sans">
+  <li><b>Multi-agent research pipelines</b> — <span>agent teams research in parallel batches; every report is tagged to its specific run, so a synthesis can only draw on its intended sources</span></li>
+  <li><b>Async job system</b> — <span>submit, process, and poll workflows with monitoring and watchdogs; stalled jobs are detected and reaped automatically</span></li>
+  <li><b>Capture quality gate</b> — <span>automated grounding checks that reject unsupported content loudly, before it can enter the knowledge base</span></li>
+  <li><b>Truthful execution reporting</b> — <span>system status comes from execution records, never from an agent's own account of what it did</span></li>
+  <li><b>Mobile review interface</b> — <span>an approval "book" on my phone: pending items by category, full-page review, approve/deny/defer with my reasoning captured on every verdict</span></li>
+</ul>
+
+<div class="shots-row">
+  <figure class="shot">
+    <img src="moss-welcome.jpg" alt="Moss companion interface — welcome screen with live backend connection">
+    <figcaption><strong>The front door.</strong> Moss, the system’s companion interface, with a live connection to the backend — approachable on purpose. The character is the UI; the machinery is underneath.</figcaption>
+  </figure>
+  <figure class="shot">
+    <img src="review-book.jpg" alt="The review book — approve/deny verdict interface with written feedback field">
+    <figcaption><strong>The review book.</strong> Where decisions enter the system: approve or deny, with my written reasoning captured on every verdict. Deny always means revise.</figcaption>
+  </figure>
+</div>
+
+<h2>The bug that taught me the most</h2>
+<div class="story">
+  <div class="tag">Field report</div>
+  <p>My worst failure wasn't a hallucination. A single structured field was silently dropped between two workflow components — no error, no warning — and for days, every research synthesis quietly blended documents from unrelated batches. The model did its job perfectly; the plumbing lied.</p>
+  <p>What caught it wasn't the model admitting fault (it can't — it didn't know). It was discipline: run a real case, read the execution records, trust nothing's self-report. The fix became doctrine, not a patch: cross-batch selection is now a deterministic step the model can't influence, every interface between components is proven at build time, and the contaminated outputs were formally superseded — kept as evidence, never as inputs.</p>
+  <p><strong>The lesson I'd carry into any organization:</strong> when an AI system fails, look at the pipes before you blame the model — and build so that failures are loud.</p>
+</div>
+
+<h2>Designed and in build</h2>
+<p>The current build phase is the <strong>epistemic core</strong> — a trust lifecycle for facts. Every claim the system captures gets a tier: unverified on arrival, mechanically verified when automated scoring clears it, human-verified only through my review — no automatic path to that tier exists — and time-tested after surviving repeated downstream use. Promotion between tiers is gated, confidence scores are calibrated against observed accuracy rather than taken at the model's word, and every state change lands in an append-only, hash-chained event ledger, so the system's history can't be silently rewritten — not even by me. In parallel, the last interface surfaces are being migrated onto the signed command plane, with the review app served from the system's own server and its credentials held in device secure storage rather than page source.</p>
+
+<h2>Design principles</h2>
+<div class="principles sans">
+  <div class="pr"><h3>Never trust self-reports</h3><p>Agents are audited against execution records, the way you'd audit any process. What the system says it did and what it did are checked independently.</p></div>
+  <div class="pr"><h3>Deterministic by default</h3><p>Fixed logic wherever possible; model judgment only where genuinely needed, and always behind a checkpoint. Deterministic steps can't confabulate.</p></div>
+  <div class="pr"><h3>Failures are loud</h3><p>A gate that fires silently is worse than no gate. Rejections, escalations, and anomalies surface immediately and terminate at a human decision — never in a void.</p></div>
+  <div class="pr"><h3>Human judgment is the scarce resource</h3><p>The review system budgets my attention — capped decisions per session, deferral without penalty — so approvals stay real judgments instead of a rubber stamp.</p></div>
+  <div class="pr"><h3>Ownership, not dependence</h3><p>A copy of the system handed to someone else would run entirely under their control, with their own credentials. Nothing routes back to me.</p></div>
+  <div class="pr"><h3>Verify, then trust — then keep verifying</h3><p>Automation is earned per category, by measured agreement with human review — and revoked automatically the moment quality slips.</p></div>
+</div>
+
+<h2>How Claude fits</h2>
+<p>Claude is both the engine inside the system and the tool I built it with. Every agent in SBAS runs on Claude; and the architecture research, design reviews, debugging, and drafting behind SBAS were all done with Claude, daily — prompts iterated when the first answer fell short, outputs verified before they were trusted. SBAS is my working answer to what responsible, verified AI automation looks like at individual scale — and building it is how I use AI every day.</p>
+
+<footer>
+  <strong>Ryan Andersen</strong> · Vacaville, CA · <a href="mailto:ryanandersen18@gmail.com">ryanandersen18@gmail.com</a> · <a href="https://www.linkedin.com/in/ryan-andersen18">linkedin.com/in/ryan-andersen18</a>
+</footer>
+
+</div>
+</body>
+</html>
 
